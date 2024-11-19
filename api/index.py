@@ -1,9 +1,29 @@
 from flask import Flask, jsonify, request
+from functools import wraps
 
 app = Flask(__name__)
 
 # API Key cố định
 API_KEY = "pikachu_attack"
+
+# Bỏ qua kiểm tra API Key cho route cụ thể
+def no_auth_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        return f(*args, **kwargs)
+    decorated_function._no_auth_required = True
+    return decorated_function
+
+@app.before_request
+def authenticate():
+    # Bỏ qua kiểm tra API Key nếu route được gắn decorator no_auth_required
+    if hasattr(app.view_functions.get(request.endpoint), "_no_auth_required"):
+        return
+
+    # Lấy API Key từ header
+    api_key = request.headers.get("X-API-Key", None)
+    if api_key != API_KEY:
+        return jsonify({"error": "Unauthorized. Invalid API Key."}), 401
 
 @app.before_request
 def authenticate():
