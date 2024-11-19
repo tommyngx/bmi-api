@@ -1,1 +1,4 @@
-Flask==2.3.2
+# /requirements.txt
+
+flask==3.0.0
+# other required dependencies
