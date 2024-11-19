@@ -2,6 +2,16 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
+# API Key cố định
+API_KEY = "pikachu_attack"
+
+@app.before_request
+def authenticate():
+    # Lấy API Key từ header
+    api_key = request.headers.get("X-API-Key")
+    if api_key != API_KEY:
+        return jsonify({"error": "Unauthorized. Invalid API Key."}), 401
+
 @app.route("/")
 def home():
     return "Welcome to the BMI API. Use the `/api/bmi` endpoint with `weight` and `height` query parameters."
